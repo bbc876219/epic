@@ -1,0 +1,51 @@
+import java.util.regex.Pattern
+
+
+apply plugin: 'signing'
+apply plugin: 'maven-publish'
+
+afterEvaluate {
+    println("isLocalRepository="+isLocalRepository)
+    println("getRepositoryUrl()="+RELEASE_URL)
+    println("NAME()="+NAME)
+    println("PASSWORD()="+PASSWORD)
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = GROUP
+                artifactId ARTIFACT_ID
+                version = VERSION
+            }
+//            debug(MavenPublication) {
+//                from components.debug
+//                groupId = GROUP
+//                artifactId = ARTIFACT_ID
+//                version = VERSION
+//            }
+        }
+
+        repositories {
+            maven {
+                allowInsecureProtocol = (isLocalRepository == "1")
+                name = "lidongjun"
+                if (isLocalRepository == "1") {
+                    url = uri("${System.env.HOME}/.m2/repository")
+                    //repository(url: uri("${System.env.HOME}/.m2/repository"))
+                    //repository(url: uri("${rootProject.buildFile.parentFile.absolutePath}/repos"))
+                } else {
+                    url = RELEASE_URL
+
+                }
+
+                credentials {
+                    username = NAME
+                    password = PASSWORD
+                }
+            }
+        }
+    }
+}
+
+
+
